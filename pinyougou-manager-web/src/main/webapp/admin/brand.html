@@ -39,7 +39,7 @@
 				}
 		}
 		$scope.reloadList=function(){
-			$scope.findPage($scope.paginationConf.currentPage,$scope.paginationConf.itemsPerPage);
+			$scope.search($scope.paginationConf.currentPage,$scope.paginationConf.itemsPerPage);
 		}
 		$scope.findPage=function(page,size){
 			$http.get("../brand/findPage.do?page="+page+"&size="+size).success(
@@ -94,6 +94,16 @@
 					}		
 				);
 		}
+		//搜索
+		$scope.searchEntity={};
+		$scope.search=function(page,size){
+			$http.post("../brand/search.do?page="+page+"&size="+size,$scope.searchEntity).success(
+					function(response){
+						$scope.list=response.rows;
+						$scope.paginationConf.totalItems=response.total;
+					}
+					);
+		}
 		
 	})
 </script>
@@ -123,7 +133,7 @@
                             </div>
                             <div class="box-tools pull-right">
                                 <div class="has-feedback">
-							                                         
+							          品牌名称：<input ng-model="searchEntity.name">  品牌首字母：<input ng-model="searchEntity.firstChar">  <button class="btn btn-default" ng-click="search(reloadList())">搜索</button>                              
                                 </div>
                             </div>
                             <!--工具栏/-->
@@ -156,7 +166,7 @@
 			                  </table>
 			                  <!--数据列表/-->                        
 							  <tm-pagination conf="paginationConf"></tm-pagination>
-							 {{ids}}
+							 
                         </div>
                         <!-- 数据表格 /-->
                         

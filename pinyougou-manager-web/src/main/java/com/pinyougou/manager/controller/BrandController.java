@@ -61,4 +61,10 @@ public class BrandController {
 			return new Result(true, "删除失败");
 		}
 	}
+	@RequestMapping("search")
+	public PageResult search(@RequestBody TbBrand brand,int page,int size) {
+		PageResult result = brandService.findPage(brand, page, size);
+		return result;
+
+	}
 }
