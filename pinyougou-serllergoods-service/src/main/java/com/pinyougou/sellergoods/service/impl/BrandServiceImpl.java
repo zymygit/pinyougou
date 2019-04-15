@@ -33,4 +33,14 @@ public class BrandServiceImpl implements BrandService {
 		// TODO Auto-generated method stub
 		brandMapper.insert(brand);
 	}
+	@Override
+	public TbBrand findById(Long id) {
+		TbBrand brand = brandMapper.selectByPrimaryKey(id);
+		return brand;
+	}
+	@Override
+	public void update(TbBrand brand) {
+		brandMapper.updateByPrimaryKey(brand);
+	}
+
 }

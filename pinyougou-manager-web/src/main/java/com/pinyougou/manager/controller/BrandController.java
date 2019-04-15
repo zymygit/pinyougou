@@ -35,6 +35,20 @@ public class BrandController {
 				// TODO: handle exception
 				return new Result(false,"增加失败");
 			}
-
+	}
+	@RequestMapping("findById")
+	public TbBrand findById(Long id) {
+		TbBrand brand = brandService.findById(id);
+		return brand;
+	}
+	@RequestMapping("update")
+	public Result update(@RequestBody TbBrand brand) {
+		try {
+			brandService.update(brand);
+			return new Result(true, "修改成功");
+		} catch (Exception e) {
+			// TODO: handle exception
+			return new Result(true, "修改失败");
+		}
 	}
 }
