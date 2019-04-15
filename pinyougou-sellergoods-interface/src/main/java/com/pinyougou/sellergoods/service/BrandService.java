@@ -31,4 +31,9 @@ public interface BrandService {
 	 * @param brand
 	 */
 	public void update(TbBrand brand);
+	/**
+	 * 删除
+	 * @param id
+	 */
+	public void delete(Long[] id);
 }

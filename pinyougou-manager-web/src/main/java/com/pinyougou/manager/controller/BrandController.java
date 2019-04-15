@@ -51,4 +51,14 @@ public class BrandController {
 			return new Result(true, "修改失败");
 		}
 	}
+	@RequestMapping("delete")
+	public Result delete(Long[] ids ) {
+		try {
+			brandService.delete(ids);
+			return new Result(true, "删除成功");
+		} catch (Exception e) {
+			// TODO: handle exception
+			return new Result(true, "删除失败");
+		}
+	}
 }
