@@ -76,5 +76,11 @@ app.controller('specificationController' ,function($scope,$controller   ,specifi
 			}			
 		);
 	}
-    
+	//新增规格选项
+	$scope.addTableRow=function(){
+		$scope.entity.specificationOptionList.push({});
+	}
+    $scope.deleTableRow=function(index){
+    	$scope.entity.specificationOptionList.splice(index,1);
+    }
 });	
