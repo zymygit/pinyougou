@@ -36,9 +36,9 @@ public class BrandController {
 				return new Result(false,"增加失败");
 			}
 	}
-	@RequestMapping("findById")
-	public TbBrand findById(Long id) {
-		TbBrand brand = brandService.findById(id);
+	@RequestMapping("findOne")
+	public TbBrand findOne(Long id) {
+		TbBrand brand = brandService.findOne(id);
 		return brand;
 	}
 	@RequestMapping("update")

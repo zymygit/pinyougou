@@ -25,7 +25,7 @@ public interface BrandService {
 	 * @param id
 	 * @return
 	 */
-	public TbBrand findById(Long id);
+	public TbBrand findOne(Long id);
 	/**
 	 * 修改
 	 * @param brand
