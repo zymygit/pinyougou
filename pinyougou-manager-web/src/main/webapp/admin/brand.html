@@ -19,10 +19,37 @@
 <script>
      //定义模块
 	var app=angular.module("pinyougou",["pagination"]);
+     
+     //品牌服务层
+     app.service("brandService",function($http){
+    	 this.findAll=function(){
+    		 return $http.get("../brand/findAll.do");
+    	 }    	 
+    	 this.findPage=function(page,size){
+    		 return $http.get("../brand/findPage.do?page="+page+"&size="+size);
+    	 }
+    	 this.findOne=function(id){
+    		 return $http.get("../brand/findOne.do?id="+id);
+    	 }
+    	 this.dele=function(ids){
+    		 return $http.get("../brand/delete.do?ids="+ids);
+    	 }
+    	 this.search=function(page,size,searchEntity){
+    		 return $http.post("../brand/search.do?page="+page+"&size="+size,searchEntity);
+    	 }
+    	 this.update=function(entity){
+    		 return $http.post("../brand/save.do",entity);
+    	 }
+    	 this.add=function(entity){
+    		 return $http.post("../brand/add.do",entity);
+    	 }
+    	 
+    	 
+     });
 	//定义控制器
-	app.controller("brandController",function($scope,$http){
+	app.controller("brandController",function($scope,$http,brandService){
 		$scope.findAll=function(){
-			$http.get("../brand/findAll.do").success(
+			brandService.findAll().success(
 				function(response){
 					$scope.list=response;
 				}		
@@ -42,7 +69,7 @@
 			$scope.search($scope.paginationConf.currentPage,$scope.paginationConf.itemsPerPage);
 		}
 		$scope.findPage=function(page,size){
-			$http.get("../brand/findPage.do?page="+page+"&size="+size).success(
+			brandService.findPage(page,size).success(
 					function(response){
 						$scope.list=response.rows;
 						$scope.paginationConf.totalItems=response.total;
@@ -51,13 +78,13 @@
 		}
 		//保存
 		$scope.save=function(){
-			var aaa="";
+			var Object=null;
 			if($scope.entity.id!=null){
-				aaa="update";
+				Object=brandService.update($scope.entity);
 			}else{
-				aaa="add";
+				Object=brandService.add($scope.entity);
 			}
-			$http.post("../brand/"+aaa+".do",$scope.entity).success(
+			Object.success(
 					function(response){
 						if(response.success){
 							$scope.reloadList();
@@ -69,7 +96,7 @@
 		}
 		//修改
 		$scope.findOne=function(id){
-			$http.get("../brand/findOne.do?id="+id).success(
+			brandService.findOne(id).success(
 				function(response){
 					$scope.entity=response;
 				}		
@@ -88,7 +115,7 @@
 		}
 		//删除
 		$scope.dele=function(){
-			$http.get("../brand/delete.do?ids="+$scope.ids).success(
+			brandService.dele($scope.ids).success(
 					function(response){
 						$scope.reloadList();
 					}		
@@ -97,7 +124,7 @@
 		//搜索
 		$scope.searchEntity={};
 		$scope.search=function(page,size){
-			$http.post("../brand/search.do?page="+page+"&size="+size,$scope.searchEntity).success(
+			brandService.search(page,size,$scope.searchEntity).success(
 					function(response){
 						$scope.list=response.rows;
 						$scope.paginationConf.totalItems=response.total;
