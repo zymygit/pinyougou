@@ -14,13 +14,13 @@ app.controller("baseController",function($scope){
 		}
 		
 		//复选框id集合
-		$scope.ids=[];
+		$scope.selectIds=[];
 		$scope.updateSelection=function($event,id){
 			if($event.target.checked){
-				$scope.ids.push(id);
+				$scope.selectIds.push(id);
 			}else{
-				var dex=$scope.ids.indexOf(id);
-				$scope.ids.splice(dex,1);
+				var dex=$scope.selectIds.indexOf(id);
+				$scope.selectIds.splice(dex,1);
 			}
 		}
 		

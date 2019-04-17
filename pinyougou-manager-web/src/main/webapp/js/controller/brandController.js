@@ -48,7 +48,7 @@
 		
 		//删除
 		$scope.dele=function(){
-			brandService.dele($scope.ids).success(
+			brandService.dele($scope.selectIds).success(
 					function(response){
 						$scope.reloadList();
 					}		

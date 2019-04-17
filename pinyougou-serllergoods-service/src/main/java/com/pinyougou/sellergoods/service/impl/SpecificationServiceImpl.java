@@ -5,9 +5,13 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.pinyougou.mapper.TbSpecificationMapper;
+import com.pinyougou.mapper.TbSpecificationOptionMapper;
 import com.pinyougou.pojo.TbSpecification;
 import com.pinyougou.pojo.TbSpecificationExample;
 import com.pinyougou.pojo.TbSpecificationExample.Criteria;
+import com.pinyougou.pojo.TbSpecificationOption;
+import com.pinyougou.pojo.TbSpecificationOptionExample;
+import com.pinyougou.pojogroup.Specification;
 import com.pinyougou.sellergoods.service.SpecificationService;
 
 import entity.PageResult;
@@ -22,6 +26,9 @@ public class SpecificationServiceImpl implements SpecificationService {
 
 	@Autowired
 	private TbSpecificationMapper specificationMapper;
+	@Autowired
+	private TbSpecificationOptionMapper specificationOptionMapper;
+	
 	
 	/**
 	 * 查询全部
@@ -45,8 +52,15 @@ public class SpecificationServiceImpl implements SpecificationService {
 	 * 增加
 	 */
 	@Override
-	public void add(TbSpecification specification) {
-		specificationMapper.insert(specification);		
+	public void add(Specification specification) {
+		
+		TbSpecification specification2 = specification.getSpecification();
+		specificationMapper.insert(specification2);
+		List<TbSpecificationOption> list = specification.getSpecificationOptionList();
+		for (TbSpecificationOption specificationOption : list) {
+			specificationOption.setSpecId(specification.getSpecification().getId());
+			specificationOptionMapper.insert(specificationOption);
+		}	
 	}
 
 	
@@ -54,8 +68,19 @@ public class SpecificationServiceImpl implements SpecificationService {
 	 * 修改
 	 */
 	@Override
-	public void update(TbSpecification specification){
-		specificationMapper.updateByPrimaryKey(specification);
+	public void update(Specification specification){
+		specificationMapper.updateByPrimaryKey(specification.getSpecification());
+		TbSpecificationOptionExample example = new TbSpecificationOptionExample();
+		com.pinyougou.pojo.TbSpecificationOptionExample.Criteria createCriteria = example.createCriteria();
+		createCriteria.andSpecIdEqualTo(specification.getSpecification().getId());
+		specificationOptionMapper.deleteByExample(example);
+		
+		List<TbSpecificationOption> lists = specification.getSpecificationOptionList();
+		for (TbSpecificationOption tbSpecificationOption : lists) {
+			tbSpecificationOption.setSpecId(specification.getSpecification().getId());
+			specificationOptionMapper.insert(tbSpecificationOption);
+		}
+		
 	}	
 	
 	/**
@@ -64,8 +89,17 @@ public class SpecificationServiceImpl implements SpecificationService {
 	 * @return
 	 */
 	@Override
-	public TbSpecification findOne(Long id){
-		return specificationMapper.selectByPrimaryKey(id);
+	public Specification findOne(Long id){
+		Specification spec = new Specification();
+		TbSpecification specification2 = specificationMapper.selectByPrimaryKey(id);
+		spec.setSpecification(specification2);
+		
+		TbSpecificationOptionExample example = new TbSpecificationOptionExample();
+		com.pinyougou.pojo.TbSpecificationOptionExample.Criteria criteria = example.createCriteria();
+		criteria.andSpecIdEqualTo(id);
+		List<TbSpecificationOption> selectByExample = specificationOptionMapper.selectByExample(example);		
+		spec.setSpecificationOptionList(selectByExample);
+		return spec;
 	}
 
 	/**
@@ -75,6 +109,10 @@ public class SpecificationServiceImpl implements SpecificationService {
 	public void delete(Long[] ids) {
 		for(Long id:ids){
 			specificationMapper.deleteByPrimaryKey(id);
+			TbSpecificationOptionExample example = new TbSpecificationOptionExample();
+			com.pinyougou.pojo.TbSpecificationOptionExample.Criteria criteria = example.createCriteria();
+			criteria.andSpecIdEqualTo(id);
+			specificationOptionMapper.deleteByExample(example);
 		}		
 	}
 	
