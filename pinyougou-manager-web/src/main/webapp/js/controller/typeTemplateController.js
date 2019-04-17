@@ -1,5 +1,5 @@
  //控制层 
-app.controller('typeTemplateController' ,function($scope,$controller   ,typeTemplateService){	
+app.controller('typeTemplateController' ,function($scope,$controller,typeTemplateService,brandService,specificationService){	
 	
 	$controller('baseController',{$scope:$scope});//继承
 	
@@ -76,5 +76,30 @@ app.controller('typeTemplateController' ,function($scope,$controller   ,typeTemp
 			}			
 		);
 	}
-    
+	//下拉列表
+	$scope.brandList={data:[]};
+	$scope.findbrandList=function(){
+		brandService.selectOptionList().success(
+				function(response){
+					$scope.brandList={data:response};
+				}
+		);
+	}
+	//下拉列表
+	$scope.specList={data:[]};
+	$scope.findspecificationList=function(){
+		specificationService.selectOptionList().success(
+				function(response){
+					$scope.specList={data:response};
+				}
+		);
+	}
+	
+	$scope.addTableRow=function(){
+		$scope.entity.customAttributeItems.push({});
+	}
+	$scope.delTableRow=function($index){
+		$scope.entity.customAttributeItems.splice($index,1);
+	}
+	
 });	
