@@ -245,4 +245,5 @@ public class TbSeller implements Serializable {
     public void setBankName(String bankName) {
         this.bankName = bankName == null ? null : bankName.trim();
     }
+    
 }
