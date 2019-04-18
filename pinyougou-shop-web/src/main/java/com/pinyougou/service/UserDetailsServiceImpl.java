@@ -30,7 +30,7 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		System.out.println(seller.getStatus());
 		if(seller!=null) {
 			if(seller.getStatus().equals("1")) {
-				return new User(username, "123456", grantedAuths);
+				return new User(username, seller.getPassword(), grantedAuths);
 			}else {
 				return null;
 			}
