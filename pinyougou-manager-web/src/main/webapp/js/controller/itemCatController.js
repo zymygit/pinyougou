@@ -76,5 +76,34 @@ app.controller('itemCatController' ,function($scope,$controller   ,itemCatServic
 			}			
 		);
 	}
+	//根据父id 查询
+    $scope.findByParentId=function(parentId){
+    	itemCatService.findByParentId(parentId).success(
+    			function(response){
+    				$scope.list=response;
+    			}
+    	);
+    }
     
+    //定义级别
+    $scope.grade=1;
+    $scope.setGrade=function(value){
+    	$scope.grade=value;
+    }
+    
+    $scope.selectList=function(entitytwo){
+    	if($scope.grade==1){
+    		$scope.entity_1=null;
+    		$scope.entity_2=null;
+    	}
+		if($scope.grade==2){
+			$scope.entity_1=entitytwo;
+			$scope.entity_2=null;
+		    	}
+		if($scope.grade==3){
+			$scope.entity_2=entitytwo;
+		}
+		
+		$scope.findByParentId(entitytwo.id);
+    }
 });	
