@@ -52,6 +52,7 @@ public class GoodsServiceImpl implements GoodsService {
 	 */
 	@Override
 	public void add(Goods goods) {
+		System.out.println(goods);
 		goods.getGoods().setAuditStatus("0");
 		goodsMapper.insert(goods.getGoods());
 		goods.getGoodsDesc().setGoodsId(goods.getGoods().getId());

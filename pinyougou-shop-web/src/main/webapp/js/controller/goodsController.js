@@ -1,5 +1,5 @@
  //控制层 
-app.controller('goodsController' ,function($scope,$controller   ,goodsService){	
+app.controller('goodsController' ,function($scope,$controller   ,goodsService,uploadService){	
 	
 	$controller('baseController',{$scope:$scope});//继承
 	
@@ -32,13 +32,18 @@ app.controller('goodsController' ,function($scope,$controller   ,goodsService){
 	}
 
 	//保存 
-	$scope.add=function(){								
-		goodsService.add($scope.entity).success(
+	$scope.add=function(){				
+		$scope.entity.goodsDesc.introduction=editor.html();
+		goodsService.add($scope.entity).success(				
 			function(response){
+				debugger;
 				if(response.success){
+					debugger;
 					alert(response.message);
 					$scope.entity={};
+					editor.html("");
 				}else{
+					
 					alert(response.message);
 				}
 			}		
@@ -70,5 +75,24 @@ app.controller('goodsController' ,function($scope,$controller   ,goodsService){
 			}			
 		);
 	}
-    
+	$scope.uploadFile=function(){
+	    	uploadService.uploadFile().success(
+	    			function(response){
+	    				if(response.success){
+	    					$scope.image_entity.url=response.message;
+	    					}
+	    				else{
+	    					alert(response.message);
+	    				}
+	    			}
+	    	);
+	    }
+	$scope.entity={goods:{},goodsDesc:{itemImages:[]}};
+
+	$scope.addImageEntity=function(){
+		$scope.entity.goodsDesc.itemImages.push($scope.image_entity);
+	}
+	$scope.removeImageEntity=function($index){
+		$scope.entity.goodsDesc.itemImages.splice($index,1);
+	}
 });	

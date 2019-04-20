@@ -18,7 +18,7 @@ http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubb
 	<http pattern="/seller/add.do" security="none"></http>
 	<!-- 页面拦截规则 -->
 	<http use-expressions="false">
-		<intercept-url pattern="/*" access="ROLE_SELLER" />
+		<intercept-url pattern="/**" access="ROLE_SELLER" />
 		<form-login login-page="/shoplogin.html" default-target-url="/admin/index.html"
 			authentication-failure-url="/shoplogin.html" always-use-default-target="true" />
 		<csrf disabled="true" />
