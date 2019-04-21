@@ -89,7 +89,7 @@ app.controller('goodsController' ,function($scope,$controller   ,goodsService,up
 	    	);
 	    }
 	//定义初始化变量
-	$scope.entity={goods:{},goodsDesc:{itemImages:[]}};
+	$scope.entity={goods:{},goodsDesc:{itemImages:[],specificationItems:[]}};
 	//图片列表添加
 	$scope.addImageEntity=function(){
 		$scope.entity.goodsDesc.itemImages.push($scope.image_entity);
@@ -140,5 +140,27 @@ app.controller('goodsController' ,function($scope,$controller   ,goodsService,up
 					$scope.entity.goodsDesc.customAttributeItems=JSON.parse($scope.typeTemplate.customAttributeItems);
 				}
 	);
+		//查询规格
+		typeTemplateService.findSpecList(newValue).success(
+				function(response){
+					$scope.specList=response;
+				}
+		);
 	});
+	//保存勾选的规格
+	$scope.updateSpecAttribute=function($event,name,value){
+		var Object=$scope.searchObjectByKey($scope.entity.goodsDesc.specificationItems,"attributeName",name);
+		if(Object!=null){
+			if($event.target.checked){
+				Object.attributeValue.push(value);
+			}else{
+				Object.attributeValue.splice(Object.attributeValue.indexOf(value),1);
+			}
+			if(Object.attributeValue.length==0){
+				$scope.entity.goodsDesc.specificationItems.splice($scope.entity.goodsDesc.specificationItems.indexOf(Object),1);
+			}
+		}else{
+			$scope.entity.goodsDesc.specificationItems.push({"attributeName":name,"attributeValue":[value]});
+		}
+	}
 });	

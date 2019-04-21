@@ -23,7 +23,7 @@ app.controller("baseController",function($scope){
 				$scope.selectIds.splice(dex,1);
 			}
 		}
-		
+		//json转换为字符串
 		$scope.jsonToString=function(jsonString,key){
 			var json=JSON.parse(jsonString);
 			var value="";
@@ -33,4 +33,15 @@ app.controller("baseController",function($scope){
 			}
 			return value;
 		}
+		//查询商品规格key是否存在
+		$scope.searchObjectByKey=function(list,key,value){
+			for(var i=0; i<list.length;i++){
+				if(list[i][key]==value){
+					return list[i];
+				}
+			}
+			return null;
+		}
+		
+		
 	})
