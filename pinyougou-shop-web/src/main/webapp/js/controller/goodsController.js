@@ -163,4 +163,26 @@ app.controller('goodsController' ,function($scope,$controller   ,goodsService,up
 			$scope.entity.goodsDesc.specificationItems.push({"attributeName":name,"attributeValue":[value]});
 		}
 	}
+	
+	//sku商品录入
+	$scope.createItemList=function(){
+		$scope.entity.itemList=[{spec:{},price:0,num:99999,status:"0",isDefault:"0"}];
+		var items=$scope.entity.goodsDesc.specificationItems;
+		for(var i=0;i<items.length;i++){
+			$scope.entity.itemList=addColum($scope.entity.itemList,items[i].attributeName,items[i].attributeValue);
+		}
+	}
+	//添加列的值
+	addColum=function(list,name,value){
+		var newList=[];
+		for(var i=0;i<list.length;i++){
+			var oldItem=list[i];
+			for(var j=0;j<value.length;j++){
+				var newItem=JSON.parse(JSON.stringify(oldItem));
+				newItem.spec[name]=value[j];
+				newList.push(newItem);
+			}
+		}
+		return newList;
+	}
 });	
