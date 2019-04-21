@@ -1,5 +1,5 @@
  //控制层 
-app.controller('goodsController' ,function($scope,$controller   ,goodsService,uploadService){	
+app.controller('goodsController' ,function($scope,$controller   ,goodsService,uploadService,itemCatService){	
 	
 	$controller('baseController',{$scope:$scope});//继承
 	
@@ -75,6 +75,7 @@ app.controller('goodsController' ,function($scope,$controller   ,goodsService,up
 			}			
 		);
 	}
+	//图片上传
 	$scope.uploadFile=function(){
 	    	uploadService.uploadFile().success(
 	    			function(response){
@@ -87,12 +88,46 @@ app.controller('goodsController' ,function($scope,$controller   ,goodsService,up
 	    			}
 	    	);
 	    }
+	//定义初始化变量
 	$scope.entity={goods:{},goodsDesc:{itemImages:[]}};
-
+	//图片列表添加
 	$scope.addImageEntity=function(){
 		$scope.entity.goodsDesc.itemImages.push($scope.image_entity);
 	}
+	//从列表中删除图片
 	$scope.removeImageEntity=function($index){
 		$scope.entity.goodsDesc.itemImages.splice($index,1);
 	}
+		//商品分类1级下拉列表
+	$scope.selectItemCat1List=function(){
+		itemCatService.findByParentId(0).success(
+			function(response){
+				$scope.itemCat1List=response;
+			}	
+		);
+	}
+	//商品分类2级下拉列表
+	$scope.$watch("entity.goods.category1_id",function(newValue,oldValue){
+		itemCatService.findByParentId(newValue).success(
+			function(response){
+				$scope.itemCat2List=response;
+			}	
+		);
+	});
+	//商品分类3级下拉列表
+	$scope.$watch("entity.goods.category2_id",function(newValue,oldValue){
+		itemCatService.findByParentId(newValue).success(
+			function(response){
+				$scope.itemCat3List=response;
+			}	
+		);
+	});
+	//获取模板Id
+	$scope.$watch("entity.goods.category3_id",function(newValue,oldValue){
+	itemCatService.findOne(newValue).success(
+			function(response){
+				$scope.entity.goods.typeTemplateId=response.typeId;
+			}
+	);
+	});
 });	
