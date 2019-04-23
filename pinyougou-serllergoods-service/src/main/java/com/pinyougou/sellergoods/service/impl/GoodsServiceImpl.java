@@ -19,10 +19,12 @@ import com.pinyougou.mapper.TbItemMapper;
 import com.pinyougou.mapper.TbSellerMapper;
 import com.pinyougou.pojo.TbBrand;
 import com.pinyougou.pojo.TbGoods;
+import com.pinyougou.pojo.TbGoodsDesc;
 import com.pinyougou.pojo.TbGoodsExample;
 import com.pinyougou.pojo.TbGoodsExample.Criteria;
 import com.pinyougou.pojo.TbItem;
 import com.pinyougou.pojo.TbItemCat;
+import com.pinyougou.pojo.TbItemExample;
 import com.pinyougou.pojo.TbSeller;
 import com.pinyougou.pojogroup.Goods;
 import com.pinyougou.sellergoods.service.GoodsDescService;
@@ -77,6 +79,45 @@ public class GoodsServiceImpl implements GoodsService {
 		goodsMapper.insert(goods.getGoods());
 		goods.getGoodsDesc().setGoodsId(goods.getGoods().getId());
 		goodsDescMapper.insert(goods.getGoodsDesc());
+		
+		
+		saveItemList(goods);
+		
+	
+	}
+	//设置sku内容
+	private void setItemValus(Goods goods,TbItem item) {
+		item.setGoodsId(goods.getGoods().getId());//设置spu编号
+		item.setSellerId(goods.getGoods().getSellerId());//设置商家编号
+		item.setCategoryid(goods.getGoods().getCategory3Id());//设置分类
+		item.setCreateTime(new Date());//设置创建日期
+		item.setUpdateTime(new Date());//设置修改时间
+		TbBrand brand = brandMapper.selectByPrimaryKey(goods.getGoods().getBrandId());
+		item.setBrand(brand.getName());//品牌名称
+		TbItemCat itemCat = itemCatMapper.selectByPrimaryKey(goods.getGoods().getCategory3Id());
+		item.setCategory(itemCat.getName());//分类名称
+		TbSeller seller = sellerMapper.selectByPrimaryKey(goods.getGoods().getSellerId());
+		item.setSeller(seller.getNickName());//商家名称
+		List<Map> list = JSON.parseArray(goods.getGoodsDesc().getItemImages(),Map.class);
+		if(list.size()>0) {
+			item.setImage((String) list.get(0).get("url"));
+		}
+	}
+	/**
+	 * 修改
+	 */
+	@Override
+	public void update(Goods goods) {
+		goodsMapper.updateByPrimaryKey(goods.getGoods());
+		goodsDescMapper.updateByPrimaryKey(goods.getGoodsDesc());
+		TbItemExample example=new TbItemExample();
+		com.pinyougou.pojo.TbItemExample.Criteria createCriteria = example.createCriteria();
+		createCriteria.andGoodsIdEqualTo(goods.getGoods().getId());
+		itemMapper.deleteByExample(example);
+		saveItemList(goods);
+	}
+	//插入sku表
+	private void saveItemList(Goods goods){
 		if("1".equals(goods.getGoods().getIsEnableSpec())) { 
 			List<TbItem> itemList = goods.getItemList();
 			
@@ -104,33 +145,6 @@ public class GoodsServiceImpl implements GoodsService {
 			setItemValus(goods,item);
 			itemMapper.insert(item);
 		}
-		
-	
-	}
-	
-	private void setItemValus(Goods goods,TbItem item) {
-		item.setGoodsId(goods.getGoods().getId());//设置spu编号
-		item.setSellerId(goods.getGoods().getSellerId());//设置商家编号
-		item.setCategoryid(goods.getGoods().getCategory3Id());//设置分类
-		item.setCreateTime(new Date());//设置创建日期
-		item.setUpdateTime(new Date());//设置修改时间
-		TbBrand brand = brandMapper.selectByPrimaryKey(goods.getGoods().getBrandId());
-		item.setBrand(brand.getName());//品牌名称
-		TbItemCat itemCat = itemCatMapper.selectByPrimaryKey(goods.getGoods().getCategory3Id());
-		item.setCategory(itemCat.getName());//分类名称
-		TbSeller seller = sellerMapper.selectByPrimaryKey(goods.getGoods().getSellerId());
-		item.setSeller(seller.getNickName());//商家名称
-		List<Map> list = JSON.parseArray(goods.getGoodsDesc().getItemImages(),Map.class);
-		if(list.size()>0) {
-			item.setImage((String) list.get(0).get("url"));
-		}
-	}
-	/**
-	 * 修改
-	 */
-	@Override
-	public void update(TbGoods goods) {
-		goodsMapper.updateByPrimaryKey(goods);
 	}
 
 	/**
@@ -140,8 +154,19 @@ public class GoodsServiceImpl implements GoodsService {
 	 * @return
 	 */
 	@Override
-	public TbGoods findOne(Long id) {
-		return goodsMapper.selectByPrimaryKey(id);
+	public Goods findOne(Long id) {
+		Goods goods = new Goods();
+		TbGoods goods2 = goodsMapper.selectByPrimaryKey(id);
+		goods.setGoods(goods2);
+		TbGoodsDesc goodsDesc = goodsDescMapper.selectByPrimaryKey(id);
+		goods.setGoodsDesc(goodsDesc);
+		
+		TbItemExample example=new TbItemExample();
+		com.pinyougou.pojo.TbItemExample.Criteria criteria = example.createCriteria();
+		criteria.andGoodsIdEqualTo(id);
+		List<TbItem> itemList = itemMapper.selectByExample(example);
+		goods.setItemList(itemList);
+		return goods;
 	}
 
 	/**
@@ -163,7 +188,8 @@ public class GoodsServiceImpl implements GoodsService {
 
 		if (goods != null) {
 			if (goods.getSellerId() != null && goods.getSellerId().length() > 0) {
-				criteria.andSellerIdLike("%" + goods.getSellerId() + "%");
+//				criteria.andSellerIdLike("%" + goods.getSellerId() + "%");
+				criteria.andSellerIdEqualTo(goods.getSellerId());
 			}
 			if (goods.getGoodsName() != null && goods.getGoodsName().length() > 0) {
 				criteria.andGoodsNameLike("%" + goods.getGoodsName() + "%");

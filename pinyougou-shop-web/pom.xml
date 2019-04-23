@@ -97,6 +97,15 @@
 		<artifactId>pinyougou-common</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</dependency>
+	<!-- 分页查询报错 -->
+	<dependency>
+    <groupId>com.github.pagehelper</groupId>
+    <artifactId>pagehelper</artifactId>
+	</dependency>
+	<dependency>
+	    <groupId>com.github.miemiedev</groupId>
+	    <artifactId>mybatis-paginator</artifactId>
+	</dependency>
   </dependencies>
   
   

@@ -1,5 +1,5 @@
 //控制层 
-app.controller('goodsController' ,function($scope,$controller   ,goodsService,uploadService,itemCatService,typeTemplateService){	
+app.controller('goodsController' ,function($scope,$controller ,$location  ,goodsService,uploadService,itemCatService,typeTemplateService){	
 	
 	$controller('baseController',{$scope:$scope});//继承
 	
@@ -23,25 +23,45 @@ app.controller('goodsController' ,function($scope,$controller   ,goodsService,up
 	}
 	
 	//查询实体 
-	$scope.findOne=function(id){				
+	$scope.findOne=function(id){
+		var id=$location.search()["id"];
+		if(id==null){
+			return;
+		}
 		goodsService.findOne(id).success(
 			function(response){
-				$scope.entity= response;					
+				debugger;
+				$scope.entity= response;	
+				editor.html($scope.entity.goodsDesc.introduction);//获取富文本
+				$scope.entity.goodsDesc.itemImages=JSON.parse($scope.entity.goodsDesc.itemImages);//图片字符串转换为JSON
+				$scope.entity.goodsDesc.customAttributeItems=JSON.parse($scope.entity.goodsDesc.customAttributeItems);//扩展信息
+				$scope.entity.goodsDesc.specificationItems=JSON.parse($scope.entity.goodsDesc.specificationItems);//规格
+				for(var i=0;i<$scope.entity.itemList.length;i++){
+					$scope.entity.itemList[i].spec=JSON.parse($scope.entity.itemList[i].spec);
+				}
 			}
-		);				
+		);
+		
+		
+		
 	}
 
 	//保存 
-	$scope.add=function(){				
+	$scope.save=function(){				
 		$scope.entity.goodsDesc.introduction=editor.html();
-		goodsService.add($scope.entity).success(				
+		var serviceObject;
+		if($scope.entity.goods.id!=null){//如果有 ID
+			serviceObject=goodsService.update( $scope.entity ); //修改 
+			}else{
+			serviceObject=goodsService.add( $scope.entity );//增加
+			}
+		serviceObject.success(				
 			function(response){
-				debugger;
 				if(response.success){
-					debugger;
 					alert(response.message);
-					$scope.entity={};
-					editor.html("");
+					location.href="goods.html";
+					/*$scope.entity={};
+					editor.html("");*/
 				}else{
 					
 					alert(response.message);
@@ -107,7 +127,7 @@ app.controller('goodsController' ,function($scope,$controller   ,goodsService,up
 		);
 	}
 	//商品分类2级下拉列表
-	$scope.$watch("entity.goods.category1_id",function(newValue,oldValue){
+	$scope.$watch("entity.goods.category1Id",function(newValue,oldValue){
 		itemCatService.findByParentId(newValue).success(
 			function(response){
 				$scope.itemCat2List=response;
@@ -115,7 +135,7 @@ app.controller('goodsController' ,function($scope,$controller   ,goodsService,up
 		);
 	});
 	//商品分类3级下拉列表
-	$scope.$watch("entity.goods.category2_id",function(newValue,oldValue){
+	$scope.$watch("entity.goods.category2Id",function(newValue,oldValue){
 		itemCatService.findByParentId(newValue).success(
 			function(response){
 				$scope.itemCat3List=response;
@@ -123,7 +143,7 @@ app.controller('goodsController' ,function($scope,$controller   ,goodsService,up
 		);
 	});
 	//获取模板Id
-	$scope.$watch("entity.goods.category3_id",function(newValue,oldValue){
+	$scope.$watch("entity.goods.category3Id",function(newValue,oldValue){
 	itemCatService.findOne(newValue).success(
 			function(response){
 				$scope.entity.goods.typeTemplateId=response.typeId;
@@ -137,7 +157,10 @@ app.controller('goodsController' ,function($scope,$controller   ,goodsService,up
 					$scope.typeTemplate=response;
 					$scope.typeTemplate.brandIds=JSON.parse($scope.typeTemplate.brandIds);
 					//扩展属性列表
-					$scope.entity.goodsDesc.customAttributeItems=JSON.parse($scope.typeTemplate.customAttributeItems);
+					if($location.search()["id"]==null){
+						$scope.entity.goodsDesc.customAttributeItems=JSON.parse($scope.typeTemplate.customAttributeItems);
+					}
+					
 				}
 	);
 		//查询规格
@@ -184,5 +207,32 @@ app.controller('goodsController' ,function($scope,$controller   ,goodsService,up
 			}
 		}
 		return newList;
+	}
+	
+	$scope.status=["未审核","已审核","审核未通过","关闭"];
+	$scope.itemCatList=[];
+	$scope.findItemCatList=function(){
+		itemCatService.findAll().success(
+				function(response){
+					for(var i=0;i<response.length;i++){
+						$scope.itemCatList[response[i].id]=response[i].name;
+					}
+				}
+		);
+	}
+	
+	$scope.checkAttributeValue=function(name,value){
+		var list=$scope.entity.goodsDesc.specificationItems;
+		var Object=$scope.searchObjectByKey(list,"attributeName",name);
+		if(Object!=null){
+			if(Object.attributeValue.indexOf(value)>=0){
+				return true;
+			}else{
+				return false;
+			}
+		}else{
+			return false;
+		}
+		
 	}
 });	
