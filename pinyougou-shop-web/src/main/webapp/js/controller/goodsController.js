@@ -211,6 +211,7 @@ app.controller('goodsController' ,function($scope,$controller ,$location  ,goods
 	
 	$scope.status=["未审核","已审核","审核未通过","关闭"];
 	$scope.itemCatList=[];
+	//查询分类id所对应的中文name
 	$scope.findItemCatList=function(){
 		itemCatService.findAll().success(
 				function(response){
@@ -220,7 +221,7 @@ app.controller('goodsController' ,function($scope,$controller ,$location  ,goods
 				}
 		);
 	}
-	
+	//修改商品返回规格勾选
 	$scope.checkAttributeValue=function(name,value){
 		var list=$scope.entity.goodsDesc.specificationItems;
 		var Object=$scope.searchObjectByKey(list,"attributeName",name);
