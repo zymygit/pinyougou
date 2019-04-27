@@ -21,7 +21,7 @@ import entity.PageResult;
  * @author Administrator
  *
  */
-@Service
+@Service(timeout=3000)
 public class ContentServiceImpl implements ContentService {
 
 	@Autowired
