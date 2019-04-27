@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.GroupOptions;
@@ -29,6 +30,8 @@ import com.pinyougou.search.service.ItemSearchService;
 public class ItemSearchServiceImpl implements ItemSearchService {
 	@Autowired
 	private SolrTemplate solrTemplate;
+	@Autowired
+	private RedisTemplate redisTemplate;
 	@Override
 	public Map<String, Object> search(Map specMap) {
 
@@ -38,11 +41,18 @@ public class ItemSearchServiceImpl implements ItemSearchService {
 			query.addCriteria(criteria);
 			ScoredPage<TbItem> page = solrTemplate.queryForPage(query, TbItem.class);
 			map.put("rows", page.getContent());*/
+			//1.按关键字查询（高亮显示）
 			Map<String,Object> map = new HashMap<>();
 			map.putAll(searchMap(specMap));
-			
-			List list = searchCategoryList(specMap);
+			//2.根据关键字查询商品分类
+			List<String> list = searchCategoryList(specMap);
 			map.put("categoryList", list);
+			//3.查询品牌和规格列表
+			if(list.size()>0) {
+				map.putAll(searchBrandAndSpecList(list.get(0)));
+			}
+			
+			
 			return map;	
 	}
 	/**
@@ -98,5 +108,21 @@ public class ItemSearchServiceImpl implements ItemSearchService {
 		}
 		return list;
 	}
-
+	/**
+	 * 查询品牌和规格列表
+	 * @param category
+	 * @return
+	 */
+	private Map searchBrandAndSpecList(String category){
+		Map map = new HashMap<>();
+		Long id = (Long) redisTemplate.boundHashOps("itemCat").get(category);
+		if(id!=null) {
+			List brandList = (List)redisTemplate.boundHashOps("brandList").get(id);
+			List specList = (List)redisTemplate.boundHashOps("specList").get(id);
+			map.put("brandList", brandList);
+			map.put("specList", specList);
+		}
+		return map;
+	}
+	
 }
