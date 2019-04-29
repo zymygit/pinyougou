@@ -1,4 +1,4 @@
-app.controller("searchController",function($scope,searchService){
+app.controller("searchController",function($scope,searchService,$location){
 	//搜索
 	$scope.search=function(){
 		if($scope.searchMap.keywords==""){
@@ -14,7 +14,7 @@ app.controller("searchController",function($scope,searchService){
 		
 	}
 	//添加搜索项
-	$scope.searchMap={"keywords":"","category":"","brand":"","spec":{},"price":"","pageNo":1,"pageSize":40};
+	$scope.searchMap={"keywords":"","category":"","brand":"","spec":{},"price":"","pageNo":1,"pageSize":40,"sort":"","sortField":""};
 	$scope.addSearchItem=function(key,value){
 		if(key=="category"||key=="brand"||key=="price"){//如果点击的是分类或者是品牌
 			$scope.searchMap[key]=value;
@@ -86,5 +86,27 @@ app.controller("searchController",function($scope,searchService){
 		}else{
 			return false;
 		}
+	}
+	//排序
+	$scope.sortSearch=function(sortField,sort){
+		$scope.searchMap.sort=sort;
+		$scope.searchMap.sortField=sortField;
+		$scope.search();//执行搜索
+	}
+	//判断关键字是不是品牌
+	$scope.keywordsIsBrand=function(){
+		for(var i=0;i<$scope.resultMap.brandList.length;i++){
+			if($scope.searchMap.keywords.indexOf($scope.resultMap.brandList[i].text)>=0){
+				return true;//关键字包含品牌
+			}
+			
+		}
+		return false;
+	}
+	//加载首页查询条件
+	$scope.loadkeywords=function(){
+		var value=$location.search()["keywords"];
+		$scope.searchMap.keywords=value;
+		$scope.search();//执行搜索
 	}
 });

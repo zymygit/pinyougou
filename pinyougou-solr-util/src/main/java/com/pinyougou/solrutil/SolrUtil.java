@@ -6,6 +6,9 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.data.solr.core.SolrTemplate;
+import org.springframework.data.solr.core.query.Query;
+import org.springframework.data.solr.core.query.SimpleQuery;
+import org.springframework.data.solr.core.query.SolrDataQuery;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.druid.support.json.JSONParser;
@@ -39,6 +42,13 @@ public class SolrUtil {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath*:spring/applicationContext*.xml");
 		SolrUtil bean = context.getBean("solrUtil",SolrUtil.class);
 		bean.importItemDate();
+		//bean.delete();
+	}
+	//清空solr
+	public void delete() {
+		Query query=new SimpleQuery("*:*");
+		solrTemplate.delete(query);
+		solrTemplate.commit();
 	}
 	
 }

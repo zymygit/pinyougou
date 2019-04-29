@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.Criteria;
@@ -18,6 +19,7 @@ import org.springframework.data.solr.core.query.Query;
 import org.springframework.data.solr.core.query.SimpleFilterQuery;
 import org.springframework.data.solr.core.query.SimpleHighlightQuery;
 import org.springframework.data.solr.core.query.SimpleQuery;
+import org.springframework.data.solr.core.query.SolrDataQuery;
 import org.springframework.data.solr.core.query.result.GroupEntry;
 import org.springframework.data.solr.core.query.result.GroupPage;
 import org.springframework.data.solr.core.query.result.GroupResult;
@@ -124,6 +126,21 @@ public class ItemSearchServiceImpl implements ItemSearchService {
 		if(pageSize==null) {
 			pageSize=20;//默认显示20条
 		}
+		//1.7 排序
+		String sortStr=(String)specMap.get("sort");//ASC DESC
+		String sortFieldStr=(String)specMap.get("sortField");//排序字段
+		if(sortStr!=null&&!sortStr.equals("")) {
+			if(sortStr.equals("ASC")) {
+				Sort sort=new Sort(Sort.Direction.ASC,"item_"+sortFieldStr);
+				query.addSort(sort);
+			}
+			if(sortStr.equals("DESC")) {
+				Sort sort=new Sort(Sort.Direction.DESC,"item_"+sortFieldStr);
+				query.addSort(sort);
+			}
+			
+		}
+		
 		query.setOffset((pageNo-1)*pageSize);
 		query.setRows(pageSize);
 		HighlightPage<TbItem> page = solrTemplate.queryForHighlightPage(query, TbItem.class);
@@ -135,6 +152,7 @@ public class ItemSearchServiceImpl implements ItemSearchService {
 				item.setTitle(h.getHighlights().get(0).getSnipplets().get(0));//将高亮部分替换原实体的未高亮部分
 			}
 		}
+		
 		map.put("rows", page.getContent());
 		map.put("totalPages", page.getTotalPages());
 		map.put("totalCount", page.getTotalElements());
@@ -181,6 +199,20 @@ public class ItemSearchServiceImpl implements ItemSearchService {
 			map.put("specList", specList);
 		}
 		return map;
+	}
+	@Override
+	public void importList(List list) {
+		solrTemplate.saveBeans(list);
+		solrTemplate.commit();
+	}
+	@Override
+	public void deleteByGoodsIds(List goodsIdList) {
+		
+		Query query=new SimpleQuery();
+		Criteria criteria=new Criteria("item_goodsid").in(goodsIdList);
+		query.addCriteria(criteria);
+		solrTemplate.delete(query);
+		solrTemplate.commit();
 	}
 	
 }

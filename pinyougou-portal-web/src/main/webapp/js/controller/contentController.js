@@ -7,4 +7,7 @@ app.controller("contentController",function($scope,contentService){
 				}
 		);
 	}
+	$scope.search=function(){
+		location.href="http://127.0.0.1:9104/search.html#?keywords="+$scope.keywords;
+	}
 });
