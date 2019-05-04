@@ -39,7 +39,7 @@ public class ItemSearchServiceImpl implements ItemSearchService {
 	@Override
 	public Map<String, Object> search(Map specMap) {
 			String str=(String)specMap.get("keywords");
-			specMap.put("keywords", str.replace(" ", ""));
+			specMap.put("keywords",str.replace(" ",""));
 			/*HashMap map = new HashMap<>();
 			Query query=new SimpleQuery();
 			Criteria criteria=new Criteria("item_keywords").is(specMap.get("keywords"));
