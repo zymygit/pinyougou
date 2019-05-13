@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,6 +34,7 @@ public class CartController {
 	 */
 	@RequestMapping("/findCartList")
 	public List<Cart> findCartList(){
+		
 		String userName = SecurityContextHolder.getContext().getAuthentication().getName();
 		String cookieValue = CookieUtil.getCookieValue(request, "cartList", "utf-8");
 		if(cookieValue==null||cookieValue.equals("")) {
@@ -62,7 +64,10 @@ public class CartController {
 	 * @return
 	 */
 	@RequestMapping("/addGoodsToCartList")
+	@CrossOrigin(origins="http://localhost:9105",allowCredentials="true")
 	public Result addGoodsToCartList(Long itemId ,Integer num) {
+		//response.setHeader("Access-Control-Allow-Origin", "http://localhost:9105");
+		//response.setHeader("Access-Control-Allow-Credentials", "true");
 		try {
 			String userName = SecurityContextHolder.getContext().getAuthentication().getName();
 			System.out.println("当前登录用户："+userName);
